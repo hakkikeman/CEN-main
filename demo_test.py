@@ -179,7 +179,7 @@ def demo_test(model_path=None):
             model.load_state_dict(torch.load(latest, map_location=DEVICE))
             print(f"  Yuklenen agirlik: {latest}")
         else:
-            print("  UYARI: Model agirligi bulunamadi! Pretrained ResNet50 ile devam ediliyor.")
+            print("  UYARI: Model agirligi bulunamadi! Pretrained ViT-B/16 ile devam ediliyor.")
     
     model.eval()
     

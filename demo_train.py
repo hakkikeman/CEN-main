@@ -10,7 +10,7 @@ Degisiklikler:
 - num_workers=0 (Windows uyumlu)
 - CPU/CUDA otomatik secim
 - DEMO_DATA/ dizinini kullanir
-- ResNet50 pretrained agirliklar dogrudan torchvision'dan alinir
+- ViT-B/16 pretrained agirliklar dogrudan torchvision'dan alinir
 """
 
 import numpy as np
@@ -25,7 +25,7 @@ from torch.utils.data import Dataset, DataLoader
 from PIL import Image, ImageDraw
 import glob
 from tqdm import tqdm
-from torchvision.models import resnet50
+
 import random
 import matplotlib
 matplotlib.use('Agg')  # GUI gerektirmeyen backend
@@ -112,10 +112,10 @@ def train_demo():
     # 2. MODELI OLUSTUR 
     # -------------------------------------------
     print(f"\n[2/4] Model olusturuluyor...")
-    print("  Backbone: ResNet50 (ImageNet pretrained)")
-    print("  FC Katmanlari: 2052 -> 1024 -> 512 -> 256")
+    print("  Backbone: ViT-B/16 (ImageNet pretrained)")
+    print("  FC Katmanlari: 772 -> 512 -> 256")
     
-    # ResNet50 pretrained agirliklarini dogrudan kullan
+    # ViT-B/16 pretrained agirliklarini dogrudan kullan
     # (model_weights klasorune gerek yok)
     model = MAX_model(weights=None).to(DEVICE)
     

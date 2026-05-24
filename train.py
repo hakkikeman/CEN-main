@@ -11,7 +11,7 @@ from PIL import Image, ImageDraw
 import glob
 from tqdm import tqdm
 from torch.optim.lr_scheduler import ReduceLROnPlateau, StepLR
-from torchvision.models import resnet50
+
 from sklearn.metrics import classification_report
 from torchvision.ops import sigmoid_focal_loss as criterion
 import random

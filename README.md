@@ -6,14 +6,14 @@ This repository contains the PyTorch implementation of the **Context Enhanced Ne
 
 ## Overview
 
-The CEN framework employs a ResNet50 backbone (pretrained on ImageNet) to extract features from mammography screening exams. By combining the Craniocaudal (CC) and Mediolateral Oblique (MLO) views, the model leverages inter-view relationships, significantly improving the diagnostic robustness compared to single-view approaches.
+The CEN framework employs a ViT-B/16 backbone (pretrained on ImageNet) to extract features from mammography screening exams. By combining the Craniocaudal (CC) and Mediolateral Oblique (MLO) views, the model leverages inter-view relationships, significantly improving the diagnostic robustness compared to single-view approaches.
 
 This repository includes a specialized **Demo Environment** (`demo_train.py` & `demo_test.py`) specifically tailored for educational demonstrations, running seamlessly on limited hardware configurations by leveraging a toy dataset (`DEMO_DATA`).
 
 ## Features
 
 - **Multi-View Fusion**: Intelligently combines MLO and CC views for enhanced contextual learning.
-- **Pretrained Backbone**: Utilizes `ResNet50` for powerful feature extraction.
+- **Pretrained Backbone**: Utilizes `ViT-B/16` for powerful feature extraction.
 - **Educational Demo Mode**: Includes lightweight training and testing scripts designed to run fast on CPUs or basic GPUs with lower memory overhead.
 - **Automated Visualization**: Generates loss curves and prediction visualisations out-of-the-box.
 

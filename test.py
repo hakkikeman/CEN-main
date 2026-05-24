@@ -9,7 +9,7 @@ from torchvision import transforms
 from torch.utils.data import Dataset, DataLoader
 import glob
 from tqdm import tqdm
-from torchvision.models import resnet50
+
 from sklearn.metrics import classification_report
 import random
 from train import read_data

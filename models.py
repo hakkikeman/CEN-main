@@ -3,39 +3,43 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torchvision.models as models
 
-
 class MAX_model(nn.Module):
-    def __init__(self, weights = None):
+    def __init__(self, weights=None):
         super(MAX_model, self).__init__()
-        self.resnet50 = models.resnet50(weights=models.ResNet50_Weights.IMAGENET1K_V1)
-        num_classes = 2
-        num_features = self.resnet50.fc.in_features
-        self.resnet50.fc = nn.Linear(num_features, num_classes)        
-        if(weights!=None):
-            self.resnet50.load_state_dict(torch.load(weights))
-        for param in self.resnet50.parameters():
-            param.requires_grad = False
-        self.convolutional_layer = nn.Sequential(*list(self.resnet50.children())[:-1])
         
-        self.fc1 = nn.Linear(2052, 1024)
-        self.fc2 = nn.Linear(1024, 512)
-        self.fc3 = nn.Linear(512, 256)
-
+        # Backbone Değişimi: ViT-B/16
+        self.vit = models.vit_b_16(weights=models.ViT_B_16_Weights.IMAGENET1K_V1)
+        
+        # Özellik Çıkarımı: Sınıflandırma katmanını Identity yaparak 768 boyutlu cls token vektörünü elde ediyoruz
+        self.vit.heads = nn.Identity()
+        
+        if weights is not None:
+            self.vit.load_state_dict(torch.load(weights))
+            
+        # Ağırlıkları Dondurma
+        for param in self.vit.parameters():
+            param.requires_grad = False
+            
+        # Lineer Katmanların (FC) Boyut Güncellemesi
+        # 768 (ViT) + 4 (kutu koordinatları) = 772
+        self.fc1 = nn.Linear(772, 512)
+        self.fc2 = nn.Linear(512, 256)
 
     def forward_once(self, view_data):
         x, boxes, _ = view_data
-        x = self.convolutional_layer(x).squeeze(-1).squeeze(-1)
-        x = torch.cat((x, boxes[:,:4]), axis=1)
-        x = torch.flatten(x, 1)
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
-        x = self.fc3(x)
         
+        # Girdi x tensörünü doğrudan ViT üzerinden geçir
+        x = self.vit(x)
+        
+        # Çıkan sonucu kutu koordinatları ile birleştir
+        x = torch.cat((x, boxes[:, :4]), axis=1)
+        
+        # Ardından relu ve fc katmanlarından geçir
+        x = F.relu(self.fc1(x))
+        x = self.fc2(x)
+        
+        # Normalize et
         return F.normalize(x, p=2, dim=1)
-
-# ResNet50'den çıkan 2048-boyutlu feature vector'e, proposal'ın 4 koordinatını (x,y,w,h) ekleyerek 
-# 2052 boyuta çıkarıyor. Sonra FC katmanlarıyla 256 boyuta indirip L2 normalize ediyor.
-
 
     def forward(self, view_0, view_1):
         # import pdb; pdb.set_trace()
@@ -52,10 +56,10 @@ class MAX_model(nn.Module):
         # context boyutu: [N, M] — her MLO proposal'ı ile her CC proposal'ı arası benzerlik
 
         # En yüksek benzerliği seç + karşı görünümün güvenilirlik skoru ile çarp
-        preds, _ = torch.max(context * view_1[1][:,4].unsqueeze(1), axis=1)
+        preds, _ = torch.max(context * view_1[1][:, 4].unsqueeze(1), axis=1)
 
         # Son skor = context-tabanlı skor + kendi orijinal skoru 
-        preds = preds + view_0[1][:,4]
+        preds = preds + view_0[1][:, 4]
 
         return preds
 
