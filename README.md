@@ -64,6 +64,34 @@ After training, evaluate the model performance on the test set:
 python demo_test.py
 ```
 This script loads the best model from `demo_output/` and generates prediction visualizations inside `demo_output/test_results/`.
+## Visual Results & Outputs
+
+The Context Enhanced Network provides automated visualizations to easily track training performance and model predictions on test cases.
+
+### Training Performance
+During training, the loss across epochs is plotted to verify model convergence.
+
+<p align="center">
+  <img src="demo_output/demo_loss_plot.png" width="60%" alt="Training & Validation Loss">
+</p>
+<p align="center"><em>Example loss plot over epochs showing consistent convergence.</em></p>
+
+### Prediction Analysis
+The test scripts generate direct visual overlays on the mammography images. In these outputs:
+- 🟦 **Blue Boxes**: Ground truth bounding boxes.
+- 🟩 **Green Boxes**: True Positive predictions (correctly identified regions by the CEN model).
+- 🟥 **Red Boxes**: False Positive predictions (incorrectly identified regions).
+
+Here is an example output from test patient `301`:
+
+<p align="center">
+  <img src="demo_output/test_results/301/MLO.png" width="45%" alt="MLO View Output">
+  &nbsp; &nbsp; &nbsp;
+  <img src="demo_output/test_results/301/CC.png" width="45%" alt="CC View Output">
+</p>
+<p align="center"><em>Left: MLO View | Right: CC View</em></p>
+
+This side-by-side visualisation effectively demonstrates how the model utilizes context from both views to pinpoint regions of interest.
 
 ## Citation
 
