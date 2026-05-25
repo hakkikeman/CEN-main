@@ -259,7 +259,7 @@ if __name__ == '__main__':
         
     train(train_data_path, test_data_path, args, exp_name)
     model_path = ""
-    tpr, fpr, fpi, sens, precs, pred_list = test(test_data_path, model_path, resnet_path=resnet_path)
+    tpr, fpr, fpi, sens, precs, pred_list = test(test_data_path, model_path)
 
 
 
