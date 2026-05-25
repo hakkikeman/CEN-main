@@ -250,10 +250,10 @@ if __name__ == '__main__':
     np.random.seed(42)
     random.seed(42)
     lr = 0.000001
-    resnet_path = "./model_weights/resnet_{}.pth".format(dataset_name)
-    args = [100, lr, 1, resnet_path]
+    vit_path = None
+    args = [100, lr, 1, vit_path]  #resnet_path yerine vit_path gönderiyoruz
 
-    exp_name = "./expts_weights/max_exps/{}_{}_resnet/max_{}".format(dataset_name, resolution, lr)
+    exp_name = "./expts_weights/max_exps/{}_{}_vit/max_{}".format(dataset_name, resolution, lr) # Klasör ismini de resnet yerine vit yaptık
 
     os.makedirs(exp_name,exist_ok=True)
         
