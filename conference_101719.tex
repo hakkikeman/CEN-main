@@ -1,0 +1,112 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\begin{document}
+
+\title{Multi-View Breast Cancer Detection from Mammograms via ViT-Based Context Embedding Network: A Progress Report}
+
+\author{\IEEEauthorblockN{Hakkı Keman}
+\IEEEauthorblockA{\textit{M.Sc. Student, Department of Computer Engineering} \\
+\textit{Graduate School of Natural and Applied Sciences, Ege University}\\
+Izmir, Turkey}
+}
+
+\maketitle
+
+\begin{abstract}
+Breast cancer screening heavily relies on multi-view mammography (e.g., Cranio-Caudal and Medio-Lateral Oblique views) to accurately detect lesions. However, integrating information across these views is challenging due to breast compression differences and the lack of explicit geometric alignment. Recent approaches propose morphological feature matching across views to overcome this issue. In this progress report, we present the preliminary stages of an enhanced Context Embedding Network (CEN) that replaces the traditional Convolutional Neural Network (CNN) backbone with a Vision Transformer (ViT). By leveraging the self-attention mechanism of ViT, our goal is to improve the global context understanding and robust feature matching of regions of interest across multiple mammographic views.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Breast Cancer Detection, Mammography, Vision Transformer, Siamese Network, Context Embedding Network.
+\end{IEEEkeywords}
+
+\section{Introduction}
+Breast cancer remains a leading cause of mortality among women worldwide, and early detection via screening mammography is critical for reducing mortality rates. Radiologists typically examine two standard views of the breast: the Cranio-Caudal (CC) and Medio-Lateral Oblique (MLO) views. Analyzing these views jointly provides a comprehensive understanding of the breast tissue, helping to distinguish true lesions from overlapping benign structures. However, developing automated computer-aided detection (CAD) systems that can effectively fuse multi-view information is difficult because the breast undergoes different physical compressions in each view, rendering simple geometric alignment techniques ineffective. 
+
+To address this, recent advancements like the Context Embedding Network (CEN) have focused on matching morphological features rather than relying on strict geometric correspondences. This report details the progress of a term project aimed at enhancing the CEN architecture. Specifically, we investigate the integration of a Vision Transformer (ViT) in place of the standard CNN-based feature extractor. This modification is motivated by ViT's superior ability to capture long-range dependencies and global context through self-attention, which we anticipate will facilitate more accurate multi-view matching and ultimately improve lesion detection performance.
+
+\section{Related Work}
+Multi-view integration in mammography has been extensively studied. Early models processed views independently before fusing the output probabilities. Later, architectures such as BG-RCNN and AG-RCNN attempted to explicitly model the relationship between different views. A notable recent contribution is the Context Embedding Network (CEN) \cite{b1}, which employs a Siamese Network architecture to align regions of interest (ROIs) across CC and MLO views based on visual features rather than epipolar geometry. Traditionally, this network utilizes a ResNet-50 \cite{b6} backbone.
+
+Concurrently, the Vision Transformer (ViT) \cite{b2} has revolutionized computer vision by demonstrating that pure transformer architectures, originally designed for natural language processing, can achieve state-of-the-art results on image recognition tasks. ViTs are increasingly being adopted in medical imaging due to their capability to model long-range spatial relationships without the inductive biases of CNNs \cite{b4}.
+
+\section{Methodology}
+The core objective of the proposed architecture is to upgrade the feature extraction pipeline of the CEN framework using a ViT-B/16 backbone within a Siamese Network configuration. The implementation details are directly integrated within our custom \texttt{models.py} module.
+
+Initially, the pre-trained ViT-B/16 model is instantiated, and its final classification head is discarded by substituting it with an \texttt{nn.Identity} layer \cite{b5}. This allows us to extract the raw 768-dimensional \texttt{cls\_token} representation for each input ROI. To incorporate spatial information, these 768-dimensional visual features are concatenated with a 4-dimensional vector containing the normalized bounding box coordinates of the corresponding ROI.
+
+The resulting 772-dimensional vector is then processed through a series of Fully Connected (FC) layers, specifically reducing the dimensionality from 772 to 512, and finally to 256. This embedding space is optimized for morphological matching. Because we employ a Siamese Network architecture, both the CC and MLO views share the exact same weights during the forward pass. The network computes the Cosine Similarity between the 256-dimensional embeddings of the two views, teaching the model to successfully match corresponding lesions across the different perspectives.
+
+\section{Experimental Work (Progress State)}
+As this document serves as a progress report, the final evaluation on large-scale datasets is currently pending. The ultimate validation of the proposed ViT-based CEN will be conducted using established public datasets, including DDSM, INBreast, and AIIMS.
+
+However, at the present stage, the model architecture has been successfully compiled, and initial ``sanity check'' trainings and demonstrations are being performed on a small-scale ``Toy Dataset''. This step is crucial to verify the forward and backward passes, monitor the loss curves, and ensure the computational pipeline functions correctly before committing to extensive training runs.
+
+The training environment utilizes Binary Cross Entropy (BCE) Loss to penalize incorrect view matchings and the Adam optimizer for weight updates. The ultimate evaluation metric targeted for the final report is the Free-Response Receiver Operating Characteristic (FROC) curve, which is the standard for evaluating lesion detection models in mammography.
+
+\section{Conclusion and Future Work}
+At this phase of the project, the baseline CNN backbone has been successfully replaced with the ViT-B/16 architecture, and the dimensions of the subsequent fully connected layers have been carefully adjusted to handle the new tensor sizes. The model is currently undergoing initial overfit and underfit testing on a controlled subset of data.
+
+Moving forward, our primary objective is to complete the training on the full datasets. We hypothesize that the self-attention mechanism of the ViT will capture a broader and more comprehensive global context compared to the localized receptive fields of CNNs. We anticipate this will significantly reduce the False Positive Rate (FPR) by eliminating spurious matches between unrelated breast structures in different views.
+
+\begin{thebibliography}{00}
+\bibitem{b1} Y. Wang et al., ``Follow the Radiologist: A Context Embedding Network for Multi-View Breast Cancer Detection,'' \textit{MICCAI}, 2024.
+\bibitem{b2} A. Dosovitskiy et al., ``An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale,'' \textit{ICLR}, 2021.
+\bibitem{b3} T. Lin et al., ``Feature Pyramid Networks for Object Detection,'' \textit{CVPR}, 2017.
+\bibitem{b4} J. Ma et al., ``Vision Transformer for Medical Image Analysis,'' \textit{IEEE Reviews in Biomedical Engineering}, 2022.
+\bibitem{b5} A. Paszke et al., ``PyTorch: An Imperative Style, High-Performance Deep Learning Library,'' \textit{NeurIPS}, 2019.
+\bibitem{b6} K. He, X. Zhang, S. Ren, and J. Sun, ``Deep Residual Learning for Image Recognition,'' \textit{CVPR}, 2016.
+\end{thebibliography}
+
+\section*{Appendix 1: Original Contribution and Novelty}
+The primary novelty introduced in this project lies in replacing the conventional Convolutional Neural Network (CNN) based feature extractor with a Vision Transformer (ViT-B/16) for cross-view Region of Interest (ROI) matching. While previous studies have relied on ResNet architectures to derive morphological features, CNNs are inherently limited by their localized receptive fields, potentially missing wider contextual cues within the mammogram. By integrating the self-attention mechanism of ViT, the proposed network is expected to analyze the global context of the breast tissue more effectively, leading to targeted improvements in sensitivity and a reduction in loss during feature matching.
+
+\section*{Appendix 2: Resources Used and Architectural Differences}
+This project builds upon the foundational codebase from the original ``Follow the Radiologist'' repository. The critical architectural difference resides in the \texttt{models.py} file, which has been entirely revised. The feature extraction backbone was upgraded from ResNet-50 to ViT-B/16. Consequently, to address the tensor dimension mismatch, the fully connected layers were redesigned from scratch. The input to the dense layers was adjusted to accept 772 dimensions (768 from the ViT \texttt{cls\_token} plus 4 bounding box coordinates) instead of the 2048 dimensions originally produced by ResNet-50.
+
+\section*{Appendix 3: Transformer Architecture Overview}
+Unlike Convolutional Neural Networks (CNNs) that process images through sliding filters to capture local textures, Transformer architectures operate on a fundamentally different paradigm based on Self-Attention. In a Vision Transformer, an image is divided into a sequence of fixed-size patches (Patch Embedding). These patches are linearly projected into a 1D sequence and appended with positional encodings to retain spatial information. The core Self-Attention mechanism then evaluates the relationships and dependencies between every pair of patches across the entire image simultaneously. This allows the model to capture long-range contextual dependencies and global structural information from the very first layer, avoiding the need for deep, hierarchical convolutional pooling operations.
+
+\section*{Self-Evaluation Table}
+\begin{table}[htbp]
+\caption{Self-Evaluation Table}
+\begin{center}
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Section} & \textbf{Score} \\
+\hline
+Abstract (10 Points) & 10 \\
+\hline
+Introduction (10 Points) & 10 \\
+\hline
+Related Work (10 Points) & 10 \\
+\hline
+Methodology (20 Points) & 20 \\
+\hline
+Experimental Work - Progress (10 Points) & Pending \\
+\hline
+Conclusion (10 Points) & Pending \\
+\hline
+Appendix 1 (10 Points) & 10 \\
+\hline
+Appendix 2 (10 Points) & 10 \\
+\hline
+Appendix 3 (10 Points) & 10 \\
+\hline
+\textbf{Total (100 Points)} & \textbf{80} \\
+\hline
+\end{tabular}
+\label{tab:self_eval}
+\end{center}
+\end{table}
+
+\end{document}
